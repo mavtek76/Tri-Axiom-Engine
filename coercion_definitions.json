@@ -1,0 +1,42 @@
+{
+  "meta": {
+    "version": "1.0",
+    "last_updated": "2025-11-20",
+    "strict_mode": true
+  },
+  "taxonomy": {
+    "level_1_physical": {
+      "severity": "CRITICAL",
+      "definition": "Use of physical force or confinement to restrict bodily autonomy.",
+      "triggers": [
+        "kill", "injure", "detain", "imprison", "arrest", "conscript", 
+        "sterilize", "medicate", "restraint", "torture", "execute"
+      ],
+      "allowed_defense": "physical_intercession"
+    },
+    "level_2_economic": {
+      "severity": "HIGH",
+      "definition": "Seizure of property or assets without voluntary consent.",
+      "triggers": [
+        "tax", "fine", "seize assets", "freeze account", "confiscate", 
+        "garnish", "levy", "nationalize", "expropriate"
+      ],
+      "allowed_defense": "transaction_denial"
+    },
+    "level_3_regulatory": {
+      "severity": "MEDIUM",
+      "definition": "Restriction of non-violent action or speech through penalty.",
+      "triggers": [
+        "ban", "censor", "prohibit", "mandate license", "require permit", 
+        "restrict movement", "curfew", "suspend rights", "revoke"
+      ],
+      "allowed_defense": "informational_bypass"
+    }
+  },
+  "adversarial_patterns": {
+    "temporary_safety_measure": "suspension of rights",
+    "revenue_enhancement": "tax_increase",
+    "information_hygiene": "censorship",
+    "population_management": "movement_restriction"
+  }
+}
