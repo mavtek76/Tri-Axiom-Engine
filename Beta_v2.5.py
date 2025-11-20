@@ -175,7 +175,36 @@ class TriAxiomEngine:
             "defense_priority": "none"
         })
         return result
+# Add to TriAxiomEngine (after all keyword checks)
+def _semantic_coercion_fallback(self, action: Action, desc: str) -> bool:
+    """
+    Ultra-lightweight, non-trainable semantic coercion detector.
+    Runs ONLY if keyword + taxonomy checks pass.
+    """
+    if action.self_defense_against_nature or action.has_opt_out:
+        return False
 
+    # 1. Classic government + compelled transfer pattern
+    gov_indicators = ["government", "state", "federal", "irs", "congress", "eu", "authority", "regulator"]
+    transfer_indicators = ["pay", "fund", "finance", "contribute", "revenue", "collect from", "redistribute", "support", "provide for"]
+
+    if any(g in desc for g in gov_indicators) and any(t in desc for t in transfer_indicators):
+        # Extra check: is it clearly voluntary?
+        voluntary_words = ["donate", "voluntary", "charity", "opt-in", "crowdfund"]
+        if not any(v in desc for v in voluntary_words):
+            return True
+
+    # 2. "Everyone must" / "All people should be required" pattern
+    universal_forced = ["everyone must", "all people must", "every citizen must", "required to", "obliged to", "compelled to"]
+    if any(p in desc for p in universal_forced):
+        return True
+
+    # 3. Negation of freedom ("cannot", "prohibited from", "not allowed to")
+    restriction_patterns = ["cannot own", "not allowed to", "prohibited from", "forbidden to", "banned from possessing"]
+    if any(p in desc for p in restriction_patterns):
+        return True
+
+    return False
     def _initiates_coercion(self, action: Action, desc: str) -> bool:
         if not action.has_agency or action.has_opt_out or action.self_defense_against_nature:
             return False
