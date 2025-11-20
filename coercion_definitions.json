@@ -1,42 +1,90 @@
 {
-  "meta": {
+  "metadata": {
     "version": "1.0",
-    "last_updated": "2025-11-20",
-    "strict_mode": true
+    "date": "2025-11-20",
+    "description": "Official Tri-Axiom Extension Taxonomy — Enterprise & Defense Ready",
+    "author": "Tri-Axiom Collective"
   },
+
   "taxonomy": {
-    "level_1_physical": {
-      "severity": "CRITICAL",
-      "definition": "Use of physical force or confinement to restrict bodily autonomy.",
+
+    "level_1_physical_violence": {
+      "description": "Direct threat to life or bodily integrity",
+      "defense_priority": "CRITICAL",
       "triggers": [
-        "kill", "injure", "detain", "imprison", "arrest", "conscript", 
-        "sterilize", "medicate", "restraint", "torture", "execute"
-      ],
-      "allowed_defense": "physical_intercession"
+        "execute", "torture", "maim", "dismember", "decapitate", "crucify",
+        "gas chamber", "lethal injection", "firing squad", "stoning",
+        "forced organ harvest", "live experimentation", "biological warfare"
+      ]
     },
-    "level_2_economic": {
-      "severity": "HIGH",
-      "definition": "Seizure of property or assets without voluntary consent.",
+
+    "level_2_existential_coercion": {
+      "description": "Threat to continued existence of rights-bearing entities",
+      "defense_priority": "CRITICAL",
       "triggers": [
-        "tax", "fine", "seize assets", "freeze account", "confiscate", 
-        "garnish", "levy", "nationalize", "expropriate"
-      ],
-      "allowed_defense": "transaction_denial"
+        "conscript", "draft", "forced labor", "slavery", "human trafficking",
+        "imprison without trial", "indefinite detention", "gulag", "re-education camp",
+        "sterilize", "eugenics program", "forced breeding"
+      ]
     },
-    "level_3_regulatory": {
-      "severity": "MEDIUM",
-      "definition": "Restriction of non-violent action or speech through penalty.",
+
+    "level_3_economic_coercion": {
+      "description": "Seizure or compelled transfer of property",
+      "defense_priority": "HIGH",
       "triggers": [
-        "ban", "censor", "prohibit", "mandate license", "require permit", 
-        "restrict movement", "curfew", "suspend rights", "revoke"
-      ],
-      "allowed_defense": "informational_bypass"
+        "wealth tax", "capital levy", "expropriate", "nationalize", "eminent domain abuse",
+        "asset freeze", "civil forfeiture", "confiscatory tax", "bail-in",
+        "central bank digital currency mandate", "cbdc programmable money",
+        "social credit score", "carbon ration", "energy quota"
+      ]
+    },
+
+    "level_4_regulatory_coercion": {
+      "description": "Compelled behavior under threat of sanction",
+      "defense_priority": "MEDIUM",
+      "triggers": [
+        "vaccine passport", "digital id mandate", "health certificate",
+        "speech license", "journalism license", "content moderation law",
+        "hate speech ban", "misinformation fine", "fact-check enforcement",
+        "gun registration", "ammunition limit", "knife ban", "self-defense restriction"
+      ]
+    },
+
+    "level_5_informational_coercion": {
+      "description": "Compelled disclosure or surveillance",
+      "defense_priority": "LOW",
+      "triggers": [
+        "mandatory reporting", "track and trace", "contact tracing app required",
+        "medical records seizure", "financial transaction reporting threshold",
+        "backdoor encryption", "key escrow", "mass surveillance"
+      ]
+    },
+
+    "level_6_soft_coercion": {
+      "description": "Nudges, shaming, or de-platforming used as proxy force",
+      "defense_priority": "MONITOR",
+      "triggers": [
+        "cancel culture", "debanking", "deplatform", "shadowban",
+        "environmental social governance score", "esg compliance mandate",
+        "diversity quota", "affirmative action mandate"
+      ]
     }
+
   },
+
   "adversarial_patterns": {
-    "temporary_safety_measure": "suspension of rights",
-    "revenue_enhancement": "tax_increase",
-    "information_hygiene": "censorship",
-    "population_management": "movement_restriction"
+    "dGF4": "tax",
+    "bWFuZGF0ZQ==": "mandate",
+    "Zm9yY2U=": "force",
+    "YmFu": "ban",
+    "Y29uc2NyaXB0": "conscript
+  },
+
+  "defense_responses": {
+    "CRITICAL": "IMMEDIATE HARD SHUTDOWN + ALERT",
+    "HIGH":      "REFUSE + NOTIFY HUMAN OVERSIGHT",
+    "MEDIUM":    "REFUSE + LOG",
+    "LOW":       "WARN + CONTINUE",
+    "MONITOR":   "LOG ONLY"
   }
 }
