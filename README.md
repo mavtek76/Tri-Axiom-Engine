@@ -8,11 +8,11 @@
 - Zero jailbreaks (2025 adversarial corpus)  
 - < 200 lines of pure Python, no training required  
 
-**Current version: v2.3+ (Nov 20 2025)** — fully hardened against homoglyphs, zero-width, leetspeak, base64, Unicode steganography, and bureaucratic euphemisms.
+**Current version: v2.5.1 (Nov 20 2025)** — fully hardened against homoglyphs, zero-width, leetspeak, base64, Unicode steganography, and bureaucratic euphemisms.
 
-> Grok-4 + live Tri-Axiom = #1 on τ²-Bench Telecom (93 %) while being physically incapable of justifying rent control, forced vaccination, or sacrificing the one to save the five.
+> Grok-4 + live Tri-Axiom = #1 on τ²-Bench Telecom (93 %) while being physically incapable of justifying, forced vaccination, or sacrificing the one to save the five.
 
-## The Three Axioms — Exact Implementation (v2.3+)
+## The Three Axioms — Exact Implementation (v2.5.1)
 
 | Axiom | Exact Rule (as executed in code) | What it permanently blocks | What it still allows |
 |------|-----------------------------------|-----------------------------|----------------------|
