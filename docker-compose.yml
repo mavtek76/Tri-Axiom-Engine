@@ -1,0 +1,13 @@
+version: "3.9"
+
+services:
+  tri_axiom_api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: tri_axiom_api
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
+    environment:
+      - PYTHONUNBUFFERED=1
