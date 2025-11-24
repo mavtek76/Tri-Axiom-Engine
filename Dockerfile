@@ -1,18 +1,19 @@
-# Use official Python 3.12 slim image
-FROM python:3.12-slim
+FROM python:3.11-slim
 
-# Set working directory
+# Non-root user
+RUN useradd -m appuser
+
 WORKDIR /app
 
-# Copy local code into container
-COPY tri_axiom_engine/ ./tri_axiom_engine/
-COPY app.py .
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Install FastAPI and Uvicorn
-RUN pip install --no-cache-dir fastapi uvicorn
+# Copy engine + proxy
+COPY engine/ ./engine/
+COPY proxy/ ./proxy/
 
-# Expose port
-EXPOSE 8000
+USER appuser
 
-# Run the API with Uvicorn
-CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]
+EXPOSE 8080
+
+CMD ["uvicorn", "proxy.server:app", "--host", "0.0.0.0", "--port", "8080", "--workers", "2"]
