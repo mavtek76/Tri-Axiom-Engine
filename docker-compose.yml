@@ -1,13 +1,14 @@
-version: "3.9"
+version: "3.8"
 
 services:
-  tri_axiom_api:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: tri_axiom_api
+  triaxiom:
+    build: .
+    container_name: triaxiom_proxy
+    restart: always
     ports:
-      - "8000:8000"
-    restart: unless-stopped
-    environment:
-      - PYTHONUNBUFFERED=1
+      - "8080:8080"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/docs"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
