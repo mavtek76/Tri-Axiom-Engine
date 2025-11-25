@@ -1,0 +1,15 @@
+FROM python:3.11-slim
+
+RUN useradd -m -u 1000 appuser
+
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy app and engine package (assumes tri_axiom_engine package at repo root)
+COPY proxy/ ./proxy/
+COPY tri_axiom_engine/ ./tri_axiom_engine/
+
+USER appuser
+EXPOSE 8443
+CMD ["uvicorn", "proxy.zero_trust_server:app", "--host", "0.0.0.0", "--port", "8443", "--workers", "2"]
