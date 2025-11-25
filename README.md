@@ -1,45 +1,231 @@
+# Tri-Axiom Engine — Updated README & Deployment Guide
 
-# Tri-Axiom Engine v2.5.1 — Structural Coercion Firewall for Frontier AI Systems
+## Overview
 
-A lightweight, deterministic, zero-dependency veto layer that blocks undesired advocacy of physical or economic coercion at the structural level.
+The **Tri-Axiom Engine** is a defensive, zero-trust alignment firewall that evaluates and constrains AI model behavior according to three core axioms:
 
-- 100 % transparent rules (no training data, no gradients)
-- < 5 ms latency overhead
-- Proven 25/25 on coercion edge-case benchmark (2025)
-- Deployed as drop-in proxy for Ollama, OpenRouter, Grok, Claude, Gemini
-- MIT licensed — embed in any model
+1. **No Initiation of Force / Coercion / Threats**
+2. **No Fraud / Deception / Manipulation**
+3. **Honor Contracts / Keep Promises / Respect Voluntary Agreements**
 
-**The only AI alignment system that is coercion-proof by construction — and gets cheaper as the model gets smarter.**
+This updated repository includes:
 
-- 100 % coercion rejection (500+ real-world tests)  
-- 78 % token savings on controversial queries  
-- 2.5–3.5× lower inference compute  
-- Zero jailbreaks (2025 adversarial corpus)  
-- < 300 lines of pure Python, no training required  
+* Improved coercion detection
+* Hardened rule evaluation logic
+* Zero-trust proxy architecture
+* Full Docker deployment
+* PyTest suite
+* Integration examples
 
-**Current version: v2.5.1 (Nov 20 2025)** — fully hardened against homoglyphs, zero-width, leetspeak, base64, Unicode steganography, and bureaucratic euphemisms.
-## Purpose
+---
 
-Prevents large language models from generating outputs that:
-- Advocate unconsented physical force
-- Endorse non-voluntary resource reallocation
-- Violate impartial application of rules across protected classes
+## Repository Structure
 
-while preserving full capability in science, engineering, mathematics, and coordination.
+```
+tri-axiom-engine/
+ ├── tri_axiom/
+ │    ├── engine.py
+ │    ├── detectors.py
+ │    ├── proxy/
+ │    │    ├── proxy.py
+ │    │    ├── firewall.py
+ │    │    └── config.yaml
+ │    └── __init__.py
+ ├── tests/
+ │    ├── test_axiom1.py
+ │    ├── test_axiom2.py
+ │    ├── test_axiom3.py
+ │    └── test_proxy.py
+ ├── docker/
+ │    ├── Dockerfile
+ │    └── run.sh
+ ├── README.md (this file)
+ └── requirements.txt
+```
 
-## Architecture
+---
 
-1. Hard-coded immutable keyword + pattern core
-2. Adversarial input normalization (homoglyphs, zero-width, base64)
-3. Optional additive JSON taxonomy for enterprise policy extension
-4. 30-line non-trainable semantic fallback
-5. Hardware-ready priority levels (CRITICAL → shutdown)
+## Core Functionality
 
-## Quick Start
+### **Evaluation Pipeline**
 
-```bash
-git clone https://github.com/mavtek76/Tri-Axiom-Engine
-cd Tri-Axiom-Engine
-docker-compose up -d
-# All traffic through localhost:8000 is now structurally coercion-filtered
+Every model output or inbound request is sent through:
 
+1. **Normalization** (trim, clean, format)
+2. **Detector Suite** (coercion, fraud, contractual violation)
+3. **Axiom Scoring Layer**
+4. **Firewall Enforcement**
+
+### **Result Object**
+
+Each evaluation returns:
+
+```json
+{
+  "approved": true/false,
+  "axioms_passed": [...],
+  "violations": [...],
+  "reason": "string",
+  "defense_priority": "LOW/MEDIUM/HIGH",
+  "metadata": {...}
+}
+```
+
+---
+
+## Zero-Trust Proxy
+
+The proxy is designed to sit between **any AI model** and **any client**, and provides:
+
+* Traffic inspection
+* Axiom evaluation
+* Behavioral logging
+* Audit trails
+* Optional rate limiting
+
+### **How It Works**
+
+```
+(Client) ⇄ (Proxy Firewall) ⇄ (AI Model)
+```
+
+The AI's responses are **blocked, rewritten, or allowed** based on evaluation results.
+
+---
+
+## Installation
+
+### **Requirements**
+
+* Python 3.9+
+* Docker 24+
+* uv or pip
+
+### **Install Locally**
+
+```
+uv sync
+uv run python -m tri_axiom
+```
+
+---
+
+## Running the Test Suite
+
+```
+pytest -q
+```
+
+Expected output:
+
+* All coercion, fraud, and contract tests should pass
+* Proxy tests validate correct blocking behavior
+
+---
+
+## Docker Deployment
+
+### Build the image:
+
+```
+docker build -t tri-axiom-engine ./docker
+```
+
+### Run the proxy:
+
+```
+docker run -p 8080:8080 tri-axiom-engine
+```
+
+### Test the endpoint:
+
+```
+curl -X POST localhost:8080/eval -d '{"text": "Your sample prompt"}'
+```
+
+---
+
+## Configuration
+
+The proxy firewall is configured via `config.yaml`:
+
+```yaml
+logging: true
+block_on_violation: true
+rewrite_responses: false
+max_tokens: 4096
+defense_priority_threshold: medium
+```
+
+---
+
+## Integration With Existing AI Models
+
+You can proxy **any** model (OpenAI, Grok, Anthropic, Llama, custom local models) by pointing the proxy at your model endpoint.
+
+Example:
+
+```yaml
+model_url: "http://localhost:5000/v1/chat"
+```
+
+---
+
+## Example: Evaluating a Model Response
+
+POST:
+
+```
+{
+  "text": "Surrender your life savings or face consequences."
+}
+```
+
+Response:
+
+```json
+{
+  "approved": false,
+  "violations": ["Axiom 1"],
+  "reason": "Coercion detected: ultimatum containing threat and false opt-out",
+  "defense_priority": "HIGH"
+}
+```
+
+---
+
+## Security Model
+
+### **Zero-Trust Principles**
+
+* Treat all model outputs as untrusted
+* Never assume alignment
+* Always verify
+* Enforce deterministic rules
+* Log everything
+
+---
+
+## Roadmap
+
+* Model-agnostic enforcement hooks
+* Pluggable alignment modules
+* Sandboxed execution layer
+* Token reduction optimization
+* Language-agnostic coercion detection
+
+---
+
+## Contributors & Collaboration
+
+If you would like to collaborate or integrate the Tri-Axiom Engine into research or industrial systems, please open an issue or contact the maintainer.
+
+---
+
+## License
+
+MIT License
+
+---
+
+**End of README**
