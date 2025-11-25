@@ -1,0 +1,8 @@
+fastapi
+uvicorn[standard]
+pydantic
+pyjwt[crypto]
+httpx
+slowapi
+prometheus-client
+requests
