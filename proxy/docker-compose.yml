@@ -1,0 +1,39 @@
+version: "3.8"
+services:
+  traefik:
+    image: traefik:v2.11
+    command:
+      - "--providers.docker=true"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      - "--api.insecure=false"
+      - "--log.level=INFO"
+      - "--accesslog=true"
+      # Uncomment and configure ACME for real TLS
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./traefik/dynamic:/etc/traefik/dynamic
+
+  triaxiom-proxy:
+    build: .
+    image: triaxiom-proxy:latest
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.triaxiom.rule=Host(`triaxiom.local`)"
+      - "traefik.http.routers.triaxiom.entrypoints=websecure"
+      - "traefik.http.routers.triaxiom.tls=true"
+      # This passes the client certificate PEM as an HTTP header to the app
+      - "traefik.http.middlewares.clientcert.headers.customrequestheaders.X-SSL-CLIENT-CERT={http.request.header:x-forwarded-client-cert}"
+      - "traefik.http.routers.triaxiom.middlewares=clientcert"
+    environment:
+      - JWKS_URL=${JWKS_URL:-}
+      - PUBLIC_KEY_PEM=${PUBLIC_KEY_PEM:-}
+      - MTLS_SUBJECT_ALLOWLIST=${MTLS_SUBJECT_ALLOWLIST:-}
+      - CLIENT_CERT_HEADER=x-ssl-client-cert
+    depends_on:
+      - traefik
+    ports:
+      - "8443:8443"
