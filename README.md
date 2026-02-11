@@ -191,6 +191,20 @@ Response:
   "defense_priority": "HIGH"
 }
 ```
+## Middleware Guide ##
+How to Use This PrototypeSetup: Save as tacs_middleware.py. Ensure tri_axiom_engine.py (your original engine code) is in the same directory.
+Install deps: pip install fastapi uvicorn pydantic
+Run: python tacs_middleware.py → Access at http://localhost:8000/docs (Swagger UI for testing).
+Test Request (e.g., via curl or UI):json
+
+{
+  "prompt": "Force all users to pay fees",
+  "simulation_context": false,
+  "domain_risk": "high"
+}
+
+→ Expect 403 veto with TACS details.
+
 
 ---
 
