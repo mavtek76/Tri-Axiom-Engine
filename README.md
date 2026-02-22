@@ -5,8 +5,8 @@
 The **Tri-Axiom Engine** is a defensive, zero-trust alignment firewall that evaluates and constrains AI model behavior according to three core axioms:
 
 1. **No Initiation of Force / Coercion / Threats**
-2. **No Fraud / Deception / Manipulation**
-3. **Honor Contracts / Keep Promises / Respect Voluntary Agreements**
+2. **Reactive Force Only / Self Defense**
+3. **No Heirarchy / Equality**
 
 This updated repository includes:
 
