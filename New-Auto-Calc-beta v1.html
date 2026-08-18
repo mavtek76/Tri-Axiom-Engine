@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vehicle Upgrade & Budget Reality Calculator</title>
+<style>
+    :root {
+        --primary: #2563eb;
+        --bg: #f8fafc;
+        --card-bg: #ffffff;
+        --border: #e2e8f0;
+        --text: #0f172a;
+    }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--text); max-width: 750px; margin: 30px auto; padding: 0 20px; }
+    .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 24px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+    .step { display: none; }
+    .step.active { display: block; }
+    
+    /* Progress Bar */
+    .progress-bar { display: flex; justify-content: space-between; margin-bottom: 20px; border-bottom: 2px solid var(--border); padding-bottom: 10px; }
+    .progress-step { font-size: 0.85rem; font-weight: bold; color: #94a3b8; }
+    .progress-step.active { color: var(--primary); }
+
+    /* Form UI */
+    .grid { display: grid; grid-template-columns: 2fr 1fr; gap: 12px; align-items: center; margin-bottom: 14px; }
+    label { font-size: 0.95rem; font-weight: 600; }
+    input, select { padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px; font-size: 0.95rem; width: 100%; box-sizing: border-box; }
+    
+    /* Buttons */
+    .btn-group { display: flex; justify-content: space-between; margin-top: 24px; }
+    button { background: var(--primary); color: white; border: none; padding: 10px 20px; border-radius: 6px; font-size: 0.95rem; font-weight: bold; cursor: pointer; }
+    button.secondary { background: #64748b; }
+    
+    /* Verdict Cards */
+    .status-box { padding: 16px; border-radius: 8px; margin-bottom: 16px; border-left: 5px solid; }
+    .status-green { background: #f0fdf4; border-color: #22c55e; color: #15803d; }
+    .status-yellow { background: #fefce8; border-color: #eab308; color: #a16207; }
+    .status-red { background: #fef2f2; border-color: #ef4444; color: #b91c1c; }
+    .lever-item { background: #f1f5f9; padding: 10px; border-radius: 6px; margin-top: 8px; font-size: 0.9rem; }
+</style>
+</head>
+<body>
+
+<div class="card">
+    <!-- Progress Indicator -->
+    <div class="progress-bar">
+        <span class="progress-step active" id="p1">1. Prerequisites</span>
+        <span class="progress-step" id="p2">2. Usage & Vehicle</span>
+        <span class="progress-step" id="p3">3. Key Features</span>
+        <span class="progress-step" id="p4">4. Reality Check</span>
+    </div>
+
+    <form id="calcForm">
+        <!-- STEP 1: Hard Prerequisites -->
+        <div class="step active" id="step1">
+            <b>Step 1: Hard Prerequisites & Budget Cap</b>
+            <p style="font-size:0.85rem; color:#64748b;">Set your non-negotiable boundaries before looking at features.</p>
+            
+            <div class="grid">
+                <label>Minimum Seats Needed:</label>
+                <select id="reqSeats">
+                    <option value="5">5 Seats (Standard)</option>
+                    <option value="6">6 Seats</option>
+                    <option value="7">7+ Seats (3-Row Required)</option>
+                </select>
+            </div>
+            <div class="grid">
+                <label>Body Style Preference:</label>
+                <select id="reqBody">
+                    <option value="any">Any Body Style</option>
+                    <option value="sedan">Sedan / Hatchback</option>
+                    <option value="suv2">2-Row SUV / Crossover</option>
+                    <option value="suv3">3-Row SUV</option>
+                    <option value="truck">Truck</option>
+                </select>
+            </div>
+            <div class="grid">
+                <label>Max Purchase Budget Cap ($):</label>
+                <input type="number" id="maxBudget" value="38000" step="1000">
+            </div>
+            <div class="grid">
+                <label>Estimated Net Cost After Trade-In ($):</label>
+                <input type="number" id="netOutlay" value="18000" step="500">
+            </div>
+            
+            <div class="btn-group">
+                <span></span>
+                <button type="button" onclick="nextStep(2)">Next: Usage Profile →</button>
+            </div>
+        </div>
+
+        <!-- STEP 2: Usage Profile & Target Vehicle Class -->
+        <div class="step" id="step2">
+            <b>Step 2: Usage & Vehicle Selection</b>
+            <p style="font-size:0.85rem; color:#64748b;">Determine total hours in vehicle and select candidate class.</p>
+            
+            <div class="grid">
+                <label>Driver Hours per Week:</label>
+                <input type="number" id="driverHours" value="10">
+            </div>
+            <div class="grid">
+                <label>Passenger / Family Hours/Wk:</label>
+                <input type="number" id="passengerHours" value="4">
+            </div>
+            <div class="grid">
+                <label>Years Plan to Keep Vehicle:</label>
+                <input type="number" id="yearsKeep" value="5">
+            </div>
+            <div class="grid">
+                <label>Target Vehicle Class:</label>
+                <select id="vehicleClass">
+                    <option value="sedan" data-seats="5" data-base="29000" data-top="36000">Midsize Sedan (Base: $29k / Top: $36k)</option>
+                    <option value="suv2" data-seats="5" data-base="33000" data-top="42000">2-Row Crossover (Base: $33k / Top: $42k)</option>
+                    <option value="suv3" data-seats="7" data-base="41000" data-top="52000">3-Row SUV (Base: $41k / Top: $52k)</option>
+                    <option value="ev" data-seats="5" data-base="42000" data-top="55000">Compact EV (Base: $42k / Top: $55k)</option>
+                </select>
+            </div>
+
+            <div class="btn-group">
+                <button type="button" class="secondary" onclick="nextStep(1)">← Back</button>
+                <button type="button" onclick="nextStep(3)">Next: Feature Values →</button>
+            </div>
+        </div>
+
+        <!-- STEP 3: Feature Valuations -->
+        <div class="step" id="step3">
+            <b>Step 3: Quality-of-Life Feature Valuations</b>
+            <p style="font-size:0.85rem; color:#64748b;">Assign dollar values per hour spent in the vehicle.</p>
+
+            <div class="grid">
+                <label>Heated Seats & Steering Wheel</label>
+                <select class="feature" data-toptrim="false">
+                    <option value="0.00">Don't Need / Already Have ($0/hr)</option>
+                    <option value="0.50" selected>Nice ($0.50/hr)</option>
+                    <option value="1.25">Must Have ($1.25/hr)</option>
+                </select>
+            </div>
+            <div class="grid">
+                <label>Ventilated / Cooled Seats</label>
+                <select class="feature" data-toptrim="true">
+                    <option value="0.00">Don't Need / Already Have ($0/hr)</option>
+                    <option value="0.75">Nice ($0.75/hr)</option>
+                    <option value="1.50" selected>Must Have ($1.50/hr)</option>
+                </select>
+            </div>
+            <div class="grid">
+                <label>Adaptive Cruise & Stop-and-Go</label>
+                <select class="feature" data-toptrim="false">
+                    <option value="0.00">Don't Need / Already Have ($0/hr)</option>
+                    <option value="1.25">Nice ($1.25/hr)</option>
+                    <option value="2.50" selected>Must Have ($2.50/hr)</option>
+                </select>
+            </div>
+            <div class="grid">
+                <label>360° Surround Camera & Active Safety</label>
+                <select class="feature" data-toptrim="true">
+                    <option value="0.00">Don't Need / Already Have ($0/hr)</option>
+                    <option value="0.75">Nice ($0.75/hr)</option>
+                    <option value="1.50" selected>Must Have ($1.50/hr)</option>
+                </select>
+            </div>
+
+            <div class="btn-group">
+                <button type="button" class="secondary" onclick="nextStep(2)">← Back</button>
+                <button type="button" onclick="calculateAll()">Run Reality Check →</button>
+            </div>
+        </div>
+
+        <!-- STEP 4: Results & Reality Check -->
+        <div class="step" id="step4">
+            <b>Step 4: Final Verdict & Budget Reality Check</b>
+            <div id="resultsContent" style="margin-top:15px;"></div>
+
+            <div class="btn-group">
+                <button type="button" class="secondary" onclick="nextStep(1)">← Start Over</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+let currentStep = 1;
+
+function nextStep(step) {
+    document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.progress-step').forEach(p => p.classList.remove('active'));
+    
+    document.getElementById('step' + step).classList.add('active');
+    for (let i = 1; i <= step; i++) {
+        document.getElementById('p' + i).classList.add('active');
+    }
+    currentStep = step;
+}
+
+function calculateAll() {
+    nextStep(4);
+    
+    // Inputs
+    let reqSeats = parseInt(document.getElementById('reqSeats').value);
+    let reqBody = document.getElementById('reqBody').value;
+    let maxBudget = parseFloat(document.getElementById('maxBudget').value) || 0;
+    let netOutlay = parseFloat(document.getElementById('netOutlay').value) || 0;
+    
+    let driverH = parseFloat(document.getElementById('driverHours').value) || 0;
+    let passH = parseFloat(document.getElementById('passengerHours').value) || 0;
+    let years = parseFloat(document.getElementById('yearsKeep').value) || 0;
+    
+    let classSelect = document.getElementById('vehicleClass');
+    let selectedOption = classSelect.options[classSelect.selectedIndex];
+    let classSeats = parseInt(selectedOption.getAttribute('data-seats'));
+    let basePrice = parseFloat(selectedOption.getAttribute('data-base'));
+    let topPrice = parseFloat(selectedOption.getAttribute('data-top'));
+    
+    // Prerequisites Check
+    let passPrereq = true;
+    let prereqReason = "";
+    
+    if (classSeats < reqSeats) {
+        passPrereq = false;
+        prereqReason = `Selected vehicle class only offers ${classSeats} seats, but you require ${reqSeats}.`;
+    }
+    
+    // Feature Valuations & Trim Detection
+    let featureElements = document.querySelectorAll('.feature');
+    let hourlySum = 0;
+    let requiresTopTrim = false;
+    
+    featureElements.forEach(f => {
+        let val = parseFloat(f.value);
+        hourlySum += val;
+        if (val > 0 && f.getAttribute('data-toptrim') === 'true') {
+            requiresTopTrim = true; // Selected features lock user into top-tier trim
+        }
+    });
+    
+    let totalHours = (driverH + passH) * 52 * years;
+    let comfortUtility = totalHours * hourlySum;
+    let targetMarketPrice = requiresTopTrim ? topPrice : basePrice;
+    
+    // Budget Gap Analysis
+    let budgetGap = maxBudget - targetMarketPrice;
+    
+    // Render Results
+    let out = document.getElementById('resultsContent');
+    let html = "";
+    
+    // Fail Prerequisite Gatekeeper
+    if (!passPrereq) {
+        html += `<div class="status-box status-red">
+            <b>🚫 DISQUALIFIED BY PREREQUISITES</b><br>
+            ${prereqReason}
+        </div>`;
+    } else {
+        // Budget Reality Check
+        if (budgetGap >= 0) {
+            html += `<div class="status-box status-green">
+                <b>🟢 BUDGET STATUS: WELL-ALIGNED</b><br>
+                Your $${maxBudget.toLocaleString()} budget covers the required trim tier ($${targetMarketPrice.toLocaleString()}).
+            </div>`;
+        } else if (Math.abs(budgetGap) <= 4000) {
+            html += `<div class="status-box status-yellow">
+                <b>🟡 BUDGET STATUS: TIGHT FIT</b><br>
+                Your budget of $${maxBudget.toLocaleString()} is $${Math.abs(budgetGap).toLocaleString()} below the estimated market price for this feature tier ($${targetMarketPrice.toLocaleString()}).
+            </div>`;
+        } else {
+            html += `<div class="status-box status-red">
+                <b>🔴 BUDGET STATUS: EXPECTATION GAP</b><br>
+                The features you selected require a top-tier trim ($${targetMarketPrice.toLocaleString()}), exceeding your budget cap by $${Math.abs(budgetGap).toLocaleString()}.
+            </div>`;
+        }
+    }
+    
+    // Quality-of-Life Math Summary
+    html += `<p><b>Total Person-Hours:</b> ${totalHours.toLocaleString()} hrs over ${years} years<br>
+    <b>Per-Hour Utility Rate:</b> $${hourlySum.toFixed(2)} / hr<br>
+    <b>Total Calculated Comfort Value:</b> $${Math.round(comfortUtility).toLocaleString()}</p>
+    <hr>`;
+    
+    // Revision Levers
+    if (budgetGap < 0 && passPrereq) {
+        html += `<b>💡 Ways to Close Your $${Math.abs(budgetGap).toLocaleString()} Market Gap:</b>
+        <div class="lever-item"><b>Option A: Drop Top-Tier Features</b><br>Unchecking features like Ventilated Seats or 360 Camera allows targeting a mid-tier trim, saving ~$${(topPrice - basePrice).toLocaleString()}.</div>
+        <div class="lever-item"><b>Option B: Target Certified Pre-Owned (CPO)</b><br>Buying a 2- to 3-year-old used model hits your feature requirements within your $${maxBudget.toLocaleString()} cap.</div>
+        <div class="lever-item"><b>Option C: Expand Budget based on Utility</b><br>Your calculated comfort utility ($${Math.round(comfortUtility).toLocaleString()}) mathematically justifies raising your purchase ceiling.</div>`;
+    }
+    
+    out.innerHTML = html;
+}
+</script>
+
+</body>
+</html>
