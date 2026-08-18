@@ -193,6 +193,10 @@ function nextStep(step) {
     currentStep = step;
 }
 
+function formatCurrency(n) {
+    return '$' + Number(n).toLocaleString();
+}
+
 function calculateAll() {
     nextStep(4);
     
@@ -205,6 +209,7 @@ function calculateAll() {
     let driverH = parseFloat(document.getElementById('driverHours').value) || 0;
     let passH = parseFloat(document.getElementById('passengerHours').value) || 0;
     let years = parseFloat(document.getElementById('yearsKeep').value) || 0;
+    if (years < 1) { years = 1; }
     
     let classSelect = document.getElementById('vehicleClass');
     let selectedOption = classSelect.options[classSelect.selectedIndex];
@@ -225,25 +230,36 @@ function calculateAll() {
     let featureElements = document.querySelectorAll('.feature');
     let hourlySum = 0;
     let requiresTopTrim = false;
+    let selectedFeatures = [];
     
     featureElements.forEach(f => {
-        let val = parseFloat(f.value);
+        let val = parseFloat(f.value) || 0;
         hourlySum += val;
         if (val > 0 && f.getAttribute('data-toptrim') === 'true') {
             requiresTopTrim = true; // Selected features lock user into top-tier trim
         }
+        // find human label for the feature
+        let label = '';
+        if (f.parentElement) {
+            let lbl = f.parentElement.querySelector('label');
+            if (lbl) label = lbl.textContent.trim();
+        }
+        if (!label) label = 'Feature';
+        if (val > 0) selectedFeatures.push({label: label, rate: val});
     });
     
     let totalHours = (driverH + passH) * 52 * years;
+    if (!isFinite(totalHours) || totalHours <= 0) totalHours = 0;
     let comfortUtility = totalHours * hourlySum;
     let targetMarketPrice = requiresTopTrim ? topPrice : basePrice;
     
-    // Budget Gap Analysis
-    let budgetGap = maxBudget - targetMarketPrice;
+    // Use netOutlay as the effective budget when provided, else fall back to maxBudget
+    let effectiveBudget = (netOutlay > 0) ? netOutlay : maxBudget;
+    let budgetGap = effectiveBudget - targetMarketPrice;
     
     // Render Results
     let out = document.getElementById('resultsContent');
-    let html = "";
+    let html = '';
     
     // Fail Prerequisite Gatekeeper
     if (!passPrereq) {
@@ -256,17 +272,17 @@ function calculateAll() {
         if (budgetGap >= 0) {
             html += `<div class="status-box status-green">
                 <b>🟢 BUDGET STATUS: WELL-ALIGNED</b><br>
-                Your $${maxBudget.toLocaleString()} budget covers the required trim tier ($${targetMarketPrice.toLocaleString()}).
+                Your available budget (${netOutlay > 0 ? 'net outlay' : 'budget cap'}) ${formatCurrency(effectiveBudget)} covers the estimated market price for this feature tier (${formatCurrency(targetMarketPrice)}).
             </div>`;
         } else if (Math.abs(budgetGap) <= 4000) {
             html += `<div class="status-box status-yellow">
                 <b>🟡 BUDGET STATUS: TIGHT FIT</b><br>
-                Your budget of $${maxBudget.toLocaleString()} is $${Math.abs(budgetGap).toLocaleString()} below the estimated market price for this feature tier ($${targetMarketPrice.toLocaleString()}[...]
+                Your available ${netOutlay > 0 ? 'net outlay' : 'budget cap'} ${formatCurrency(effectiveBudget)} is ${formatCurrency(Math.abs(budgetGap))} below the estimated market price for this feature tier (${formatCurrency(targetMarketPrice)}). You may be able to negotiate, look at lightly used examples, or prioritize 1–2 features to close the gap.
             </div>`;
         } else {
             html += `<div class="status-box status-red">
                 <b>🔴 BUDGET STATUS: EXPECTATION GAP</b><br>
-                The features you selected require a top-tier trim ($${targetMarketPrice.toLocaleString()}), exceeding your budget cap by $${Math.abs(budgetGap).toLocaleString()}.
+                The features you selected require a higher-tier trim (${formatCurrency(targetMarketPrice)}), exceeding your available ${netOutlay > 0 ? 'net outlay' : 'budget cap'} by ${formatCurrency(Math.abs(budgetGap))}.
             </div>`;
         }
     }
@@ -274,16 +290,29 @@ function calculateAll() {
     // Quality-of-Life Math Summary
     html += `<p><b>Total Person-Hours:</b> ${totalHours.toLocaleString()} hrs over ${years} years<br>
     <b>Per-Hour Utility Rate:</b> $${hourlySum.toFixed(2)} / hr<br>
-    <b>Total Calculated Comfort Value:</b> $${Math.round(comfortUtility).toLocaleString()}</p>
+    <b>Total Calculated Comfort Value:</b> ${formatCurrency(Math.round(comfortUtility))}</p>
     <hr>`;
+    
+    // Show selected features
+    if (selectedFeatures.length) {
+        html += `<p><b>Selected Features (rated by $/hr):</b></p><ul>`;
+        selectedFeatures.forEach(sf => {
+            html += `<li>${sf.label}: $${sf.rate.toFixed(2)} / hr</li>`;
+        });
+        html += `</ul>`;
+    }
     
     // Revision Levers
     if (budgetGap < 0 && passPrereq) {
-        html += `<b>💡 Ways to Close Your $${Math.abs(budgetGap).toLocaleString()} Market Gap:</b>
-        <div class="lever-item"><b>Option A: Drop Top-Tier Features</b><br>Unchecking features like Ventilated Seats or 360 Camera allows targeting a mid-tier trim, saving ~$${(topPrice - basePrice).t[...]}
-        <div class="lever-item"><b>Option B: Target Certified Pre-Owned (CPO)</b><br>Buying a 2- to 3-year-old used model hits your feature requirements within your $${maxBudget.toLocaleString()} cap.[...]
-        <div class="lever-item"><b>Option C: Expand Budget based on Utility</b><br>Your calculated comfort utility ($${Math.round(comfortUtility).toLocaleString()}) mathematically justifies raising yo[...]
+        let savingsIfDrop = requiresTopTrim ? (topPrice - basePrice) : 0;
+        html += `<b>💡 Ways to Close Your ${formatCurrency(Math.abs(budgetGap))} Market Gap:</b>`;
+        html += `<div class="lever-item"><b>Option A: Reduce Top-Tier Feature Requirements</b><br>Removing top-trim-only features (e.g., ventilated seats, surround camera) can allow you to target the base/mid trim and potentially save about ${formatCurrency(savingsIfDrop)} off MSRP.</div>`;
+        html += `<div class="lever-item"><b>Option B: Consider Certified Pre-Owned (CPO) or Low-Mileage Used</b><br>Buying a 2–3 year old model with the features you want often brings the market price down into your available ${netOutlay > 0 ? 'net outlay' : 'budget cap'} (${formatCurrency(effectiveBudget)}).</div>`;
+        html += `<div class="lever-item"><b>Option C: Re-evaluate Budget Using Utility</b><br>Your calculated comfort utility (${formatCurrency(Math.round(comfortUtility))}) represents the total value you'll derive from these features over ${years} years; if this value matters more than sticker shock, you could justify increasing your budget or financing the difference.</div>`;
     }
+    
+    // Additional notes
+    html += `<hr><p style="font-size:0.9rem;color:#64748b;"><b>Note:</b> 'Net Cost After Trade-In' is used as the effective available amount when provided; otherwise the 'Max Purchase Budget Cap' is used. You can adjust either field to see alternative outcomes.</p>`;
     
     out.innerHTML = html;
 }
